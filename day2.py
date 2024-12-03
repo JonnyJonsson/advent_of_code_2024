@@ -9,67 +9,82 @@ with open("day2_input", "r") as f:
 
 for i, raport in enumerate(raports):
 	raports[i] = list(map(int, raports[i]))
-# asc desc abs(i - i+1) = 1,2,3
 
 # Safe
 raports_safe = 0
 descanding = 0
 ascending = 0
+unsorted_raports = raports
 
 for raport in raports:
-	if raport[0] > raport[1]:
-		for i, level in enumerate(raport):
-			if i == len(raport) - 1:
-				if ascending == len(raport) - 1:
-					raports_safe += 1
-				ascending = 0
-				break
-			if raport[i] - raport[i + 1] in (1, 2, 3):
-				ascending += 1
-			else:
-				damp = raport[i]
-				# print(f"level: {raport[i]} level next: {raport[i+1]}")
-	elif raport[0] < raport[1]:
-		for i, level in enumerate(raport):
-			if i == len(raport) - 1:
-				if descanding == len(raport) - 1:
-					raports_safe += 1
-				descanding = 0
-				break
-			if raport[i] - raport[i + 1] in (-1, -2, -3):
-				descanding += 1
-				# print(f"level: {raport[i]} level next: {raport[i+1]}")
-
-print(f"safe raports: {raports_safe}")
-
-# Damp
-dampener = 0
-list_damp = []
-descanding = 0
-ascending = 0
+	# print(len(raport))
+	for i, level in enumerate(raport):
+		if i == len(raport) - 1:
+			del raport[-1]
+		else:
+			raport[i] = raport[i + 1] - raport[i]
+	# print(raport)
 
 for raport in raports:
-	if raport[0] > raport[1]:
-		for i, level in enumerate(raport):
-			if i == len(raport) - 1:
-				if ascending == len(raport) - 2:
-					raports_safe += 1
-				ascending = 0
-				break
-			if raport[i] - raport[i + 1] in (1, 2, 3):
-				ascending += 1
-			else:
-				damp = raport[i]
-				# print(f"level: {raport[i]} level next: {raport[i+1]}")
-	elif raport[0] < raport[1]:
-		for i, level in enumerate(raport):
-			if i == len(raport) - 1:
-				if descanding == len(raport) - 2:
-					raports_safe += 1
-				descanding = 0
-				break
-			if raport[i] - raport[i + 1] in (-1, -2, -3):
-				descanding += 1
-				# print(f"level: {raport[i]} level next: {raport[i+1]}")
+	if all(i < 4 and i > -4 for i in raport):
+		if all(i > 0 for i in raport):
+			# print(raport)
+			raports_safe += 1
+		elif all(i < 0 for i in raport):
+			raports_safe += 1
+		else:
+			unsafe_raports.append(raport)
+	else:
+		unsafe_raports.append(raport)
 
-print(f"safe raports plus damp raports: {raports_safe + dampener}")
+
+print(raports_safe)
+
+
+def only_one(raport):
+	if not all(i > 0 for i in raport):
+		if not all(i < 0 for i in raport):
+			pos = 0
+			neg = 0
+			zero = 0
+			for level in raport:
+				if level > 0:
+					pos += 1
+				elif level < 0:
+					neg += 1
+				elif level == 0:
+					zero += 1
+
+			if pos > 1 and neg > 1:
+				return False
+			if pos > 0 and neg > 0 and zero > 0:
+				return False
+			if any(i > 3 for i in raport) and neg > 0:
+				return False
+			elif any(i < -3 for i in raport) and pos > 0:
+				return False
+			elif any(i > 3 for i in raport) and zero > 0:
+				return False
+			elif any(i < -3 for i in raport) and zero > 0:
+				return False
+
+	found = False
+	for level in raport:
+		if level > 3 or level < -3 or level == 0:
+			if found:
+				return False
+			else:
+				found = True
+
+	return True
+
+
+damp = 0
+
+for raport in unsafe_raports:
+	if only_one(raport):
+		damp += 1
+		print(raport)
+
+print(f"damp: {damp}")
+print(f"total: {raports_safe + damp}")
