@@ -1,4 +1,6 @@
 import csv
+import copy
+import itertools
 
 raports = []
 
@@ -14,9 +16,8 @@ for i, raport in enumerate(raports):
 raports_safe = 0
 descanding = 0
 ascending = 0
-unsorted_raports = raports
-
-for raport in raports:
+raports_delta = copy.deepcopy(raports)
+for raport in raports_delta:
 	# print(len(raport))
 	for i, level in enumerate(raport):
 		if i == len(raport) - 1:
@@ -25,20 +26,25 @@ for raport in raports:
 			raport[i] = raport[i + 1] - raport[i]
 	# print(raport)
 
-for raport in raports:
+for raport in raports_delta:
 	if all(i < 4 and i > -4 for i in raport):
 		if all(i > 0 for i in raport):
 			# print(raport)
 			raports_safe += 1
 		elif all(i < 0 for i in raport):
 			raports_safe += 1
-		else:
-			unsafe_raports.append(raport)
-	else:
-		unsafe_raports.append(raport)
-
 
 print(raports_safe)
+
+qq = [1, -1, 3, 4]
+qqq = [1, 2, 4, 5]
+
+for q in itertools.combinations(qq, len(qq) - 1):
+	print(q)
+
+for raport in raports:
+	for level in raport:
+		pass
 
 
 def only_one(raport):
@@ -59,10 +65,14 @@ def only_one(raport):
 				return False
 			if pos > 0 and neg > 0 and zero > 0:
 				return False
-			if any(i > 3 for i in raport) and neg > 0:
-				return False
-			elif any(i < -3 for i in raport) and pos > 0:
-				return False
+			if pos == len(raport) - 1 and all(i < 4 for i in raport):
+				return True
+			if neg == len(raport) - 1 and all(i > -4 for i in raport):
+				return True
+			# if any(i > 3 for i in raport) and neg > 0:
+			# return False
+			# elif any(i < -3 for i in raport) and pos > 0:
+			# return False
 			elif any(i > 3 for i in raport) and zero > 0:
 				return False
 			elif any(i < -3 for i in raport) and zero > 0:
@@ -76,15 +86,39 @@ def only_one(raport):
 			else:
 				found = True
 
-	return True
+	return found
 
 
 damp = 0
 
-for raport in unsafe_raports:
-	if only_one(raport):
-		damp += 1
-		print(raport)
+for i, raport_delta in enumerate(raports_delta):
+	print(f"raport_delta: {raport_delta}")
+	if only_one(raport_delta):
+		print(f"found only one: {raport_delta}")
+		print(f"creating combos of {raports[i]}")
+		raports_combos = [
+			list(raport) for raport in itertools.combinations(raports[i], len(raports[i]) - 1)
+		]
+		# print(f"raport combo: {type(raports_combos[0])}")
+		for raport_combo in raports_combos:
+			for n, level in enumerate(raport_combo):
+				if n == len(raport_combo) - 1:
+					del raport_combo[-1]
+				else:
+					raport_combo[n] = raport_combo[n + 1] - raport_combo[n]
+
+		for raport in raports_combos:
+			print(f"check if combo is safe: {raport}")
+			if all(level < 4 and level > -4 for level in raport):
+				if all(level > 0 for level in raport):
+					# print(f"found damp raport {raport}")
+					damp += 1
+					break
+				elif all(level < 0 for level in raport):
+					# print(f"found damp raport {raport}")
+					damp += 1
+					break
+
 
 print(f"damp: {damp}")
 print(f"total: {raports_safe + damp}")
