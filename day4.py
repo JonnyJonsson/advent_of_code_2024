@@ -3,7 +3,6 @@ import numpy as np
 
 input = []
 XMAS = ["X", "M", "A", "S"]
-# test = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 xmas_sum = 0
 
 with open("day4_input", "r") as f:
@@ -31,29 +30,25 @@ def calc_xmas(line=["X", "X", "M", "A", "S", "X", "M", "A", "S"]):
 	return occurence
 
 
+def search_matrix(matrix):
+	sum = 0
+	for line in matrix:
+		sum += calc_xmas(line.tolist())
+	print(f"found {sum} XMAS in matrix")
+	return sum
+
+
+# Diagonals
 for i in range(0, 4):
 	matrix = np.rot90(matrix, k=i)
 	diags = [matrix[::1, :].diagonal(i) for i in range(-matrix.shape[0] + 1, matrix.shape[1])]
+	xmas_sum += search_matrix(diags)
+print(f"XMAS diagonals: {xmas_sum}")
 
-	for dia in diags:
-		# print(dia.tolist())
-		xmas_sum += calc_xmas(dia.tolist())
-print(f"xmas_sum after diagonals: {xmas_sum}")
 
-for line in matrix:
-	xmas_sum += calc_xmas(line.tolist())
-print(f"xmas_sum after left-right {xmas_sum}")
-
-for line in np.fliplr(matrix):
-	xmas_sum += calc_xmas(line.tolist())
-print(f"xmas_sum after right-left {xmas_sum}")
-
-for line in matrix.T:
-	xmas_sum += calc_xmas(line.tolist())
-print(f"xmas_sum after top-down {xmas_sum}")
-
-for line in np.flipud(matrix).T:
-	xmas_sum += calc_xmas(line.tolist())
-print(f"xmas_sum after down-top {xmas_sum}")
+xmas_sum += search_matrix(matrix)
+xmas_sum += search_matrix(np.fliplr(matrix))
+xmas_sum += search_matrix(matrix.T)
+xmas_sum += search_matrix(np.flipud(matrix).T)
 
 print(f"xmas sum:  {xmas_sum}")
