@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 
 input = []
 XMAS = ["X", "M", "A", "S"]
@@ -38,6 +39,7 @@ def search_matrix(matrix):
 	return sum
 
 
+"""
 # Diagonals
 for i in range(0, 4):
 	matrix = np.rot90(matrix, k=i)
@@ -52,3 +54,32 @@ xmas_sum += search_matrix(matrix.T)
 xmas_sum += search_matrix(np.flipud(matrix).T)
 
 print(f"xmas sum:  {xmas_sum}")
+"""
+# M - S
+# - A -
+# M - S
+# If 5 == A, 0,3,7,9 contains 2xM and 2xS
+X_mas = 0
+MAS = np.empty((0, 3))
+
+MAS = np.append(MAS, [["M", ".", "S"]], axis=0)
+MAS = np.append(MAS, [[".", "A", "."]], axis=0)
+MAS = np.append(MAS, [["M", ".", "S"]], axis=0)
+# MAS = np.append(MAS, [[".", ".", ".", "."]], axis=0)
+
+window = sliding_window_view(matrix, (3, 3))
+
+for windows in window:
+	for i in range(0, 4):
+		mas = np.rot90(MAS, k=i)
+		for w in windows:
+			mas[0][1] = w[0][1]
+			mas[1][0] = w[1][0]
+			mas[1][2] = w[1][2]
+			mas[2][1] = w[2][1]
+			if (w == mas).all():
+				X_mas += 1
+				# print("found match")
+				# print(w[1][1])
+
+print(f"X-mas: {X_mas}")
