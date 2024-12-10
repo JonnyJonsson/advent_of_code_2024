@@ -39,7 +39,6 @@ def search_matrix(matrix):
 	return sum
 
 
-"""
 # Diagonals
 for i in range(0, 4):
 	matrix = np.rot90(matrix, k=i)
@@ -54,22 +53,17 @@ xmas_sum += search_matrix(matrix.T)
 xmas_sum += search_matrix(np.flipud(matrix).T)
 
 print(f"xmas sum:  {xmas_sum}")
-"""
-# M - S
-# - A -
-# M - S
-# If 5 == A, 0,3,7,9 contains 2xM and 2xS
+
+# Part 2
 X_mas = 0
 MAS = np.empty((0, 3))
-
 MAS = np.append(MAS, [["M", ".", "S"]], axis=0)
 MAS = np.append(MAS, [[".", "A", "."]], axis=0)
 MAS = np.append(MAS, [["M", ".", "S"]], axis=0)
-# MAS = np.append(MAS, [[".", ".", ".", "."]], axis=0)
 
-window = sliding_window_view(matrix, (3, 3))
+views = sliding_window_view(matrix, (3, 3))
 
-for windows in window:
+for windows in views:
 	for i in range(0, 4):
 		mas = np.rot90(MAS, k=i)
 		for w in windows:
@@ -79,7 +73,5 @@ for windows in window:
 			mas[2][1] = w[2][1]
 			if (w == mas).all():
 				X_mas += 1
-				# print("found match")
-				# print(w[1][1])
 
-print(f"X-mas: {X_mas}")
+print(f"X-mas sum: {X_mas}")
