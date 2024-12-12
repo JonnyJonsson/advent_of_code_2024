@@ -1,30 +1,51 @@
 import csv
+from graphlib import TopologicalSorter
 
-list_l = []
-list_r = []
-distance = 0
+tree = []
+# 74,57,28,17,96
+# 74|11
+# 74|57
 
-with open("day1_input", "r") as f:
+with open("day5_input", "r") as f:
 	reader = csv.reader(f, delimiter=" ")
 	for row in reader:
-		list_l.append(row[0])
-		list_r.append(row[3])
+		tree.append(row)
+print_queue = ["75", "97", "47", "61", "53"]
+graph = {
+	"47": {"53", "13", "61", "29"},
+	"97": {"13", "61", "47", "29", "53", "75"},
+	"75": {"29", "53", "47", "61", "13"},
+	"61": {"13", "53", "29"},
+	"29": {"13"},
+	"53": {"29", "13"},
+}
+ts = TopologicalSorter(graph)
+order = ts.static_order()
+nodes = list(order)
+# print(nodes)
+printed = []
 
-list_l.sort()
-list_l = list(map(int, list_l))
-list_r.sort()
-list_r = list(map(int, list_r))
+for paper in print_queue:
+	# All nodes that need to be before paper
+	temp = [n for n in nodes if nodes.index(n) > nodes.index(paper)]
+	# print(f"paper: {paper}")
+	print(temp)
+	# print(printed)
+	for p in printed:
+		if p in temp:
+			temp.remove(p)
+			# print(f"removed {p} from temp: {temp}")
+	# See if print_queue is in the right order
+	print("y")
+	print(temp)
+	print([nodes.index(n) for n in nodes if n in temp])
+	if (
+		nodes.index(paper) > all([nodes.index(n) for n in nodes if n in temp])
+		or print_queue.index(paper) == len(print_queue) - 1
+	):
+		print(f"paper {paper} is in right order")
+	else:
+		print("wrong order")
+		break
 
-for i, id in enumerate(list_l):
-	distance += abs(list_l[i] - list_r[i])
-
-print(f"distance = {distance}")
-
-similarity_score = 0
-
-for id in list_l:
-	if id in list_r:
-		count = sum(1 for i in list_r if i == id)
-		similarity_score += count * id
-
-print(f"similarity_score = {similarity_score}")
+	printed.append(paper)
