@@ -17,17 +17,17 @@ for row in input:
 		break
 	rules.append((int(row[0][:2]), int(row[0][3:5])))
 
-found = False
+found_start_queues = False
 for row in input:
-	if found:
+	if found_start_queues:
 		print_queues.append([int(n) for n in row[0].split(",")])
 	if not row:
-		found = True
+		found_start_queues = True
 
-# print_queues = [[57, 74, 28, 17, 96], [74, 57, 28, 17, 96]]
-# print(f"print_queue: {print_queue}")
-for print_queue in print_queues:
+
+def create_graph(print_queue):
 	graph = {}
+
 	for key, value in rules:
 		if key in print_queue:
 			if key in graph:
@@ -35,21 +35,15 @@ for print_queue in print_queues:
 			else:
 				graph[key] = [value]
 
-	"""
-	graph = {
-		47: [53, 13, 61, 29],
-		97: [13, 61, 47, 29, 53, 75],
-		75: [29, 53, 47, 61, 13],
-		61: [13, 53, 29],
-		29: [13],
-		53: [29, 13],
-	}
-	"""
+	return graph
+
+
+for print_queue in print_queues:
+	graph = create_graph(print_queue)
+
 	ts = TopologicalSorter(graph)
 	order = ts.static_order()
 	nodes = list(order)
-	printed = []
-	# print(f"nodes order: {nodes}")
 
 	reorder = [n for n in nodes if n in print_queue]
 	reorder = list(reversed(reorder))
