@@ -23,7 +23,7 @@ for row in input:
 	if not row:
 		found = True
 
-# print_queue = [74, 57, 28, 17, 96]
+print_queues = [[57, 74, 28, 17, 96]]
 # print(f"print_queue: {print_queue}")
 for print_queue in print_queues:
 	graph = {}
@@ -53,6 +53,10 @@ for print_queue in print_queues:
 	nodes = list(order)
 	printed = []
 	print(f"nodes order: {nodes}")
+
+	reorder = [n for n in nodes if n in print_queue]
+	print(f"reorder: {reorder}")
+	print_queue = list(reversed(reorder))
 
 	for paper in print_queue:
 		# All nodes that need to be before paper
