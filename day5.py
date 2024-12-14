@@ -5,6 +5,7 @@ input = []
 rules = []
 print_queues = []
 middle_page_num = 0
+middle_reorder_num = 0
 
 with open("day5_input", "r") as f:
 	reader = csv.reader(f, delimiter=" ")
@@ -23,7 +24,7 @@ for row in input:
 	if not row:
 		found = True
 
-print_queues = [[57, 74, 28, 17, 96]]
+# print_queues = [[57, 74, 28, 17, 96], [74, 57, 28, 17, 96]]
 # print(f"print_queue: {print_queue}")
 for print_queue in print_queues:
 	graph = {}
@@ -33,10 +34,6 @@ for print_queue in print_queues:
 				graph[key].append(value)
 			else:
 				graph[key] = [value]
-
-	for key in graph:
-		print(key)
-		print(graph[key])
 
 	"""
 	graph = {
@@ -52,35 +49,15 @@ for print_queue in print_queues:
 	order = ts.static_order()
 	nodes = list(order)
 	printed = []
-	print(f"nodes order: {nodes}")
+	# print(f"nodes order: {nodes}")
 
 	reorder = [n for n in nodes if n in print_queue]
-	print(f"reorder: {reorder}")
-	print_queue = list(reversed(reorder))
+	reorder = list(reversed(reorder))
 
-	for paper in print_queue:
-		# All nodes that need to be before paper
-		temp = [n for n in nodes if nodes.index(n) > nodes.index(paper)]
-		print(f"temp: {temp}")
-		for p in printed:
-			if p in temp:
-				temp.remove(p)
-
-		for p in nodes:
-			if p not in print_queue:
-				if p in temp:
-					temp.remove(p)
-
-		# See if print_queue is in the right order
-		if print_queue.index(paper) == len(print_queue) - 1:
-			print(f"paper {paper} is in right order")
-			middle_page_num += print_queue[len(print_queue) // 2]
-		elif all(nodes.index(paper) > nodes.index(n) for n in temp):
-			print(f"paper: {paper} in rigt order")
-		else:
-			print(f"paper: {paper} in wrong order")
-			break
-
-		printed.append(paper)
+	if reorder == print_queue:
+		middle_page_num += print_queue[len(print_queue) // 2]
+	else:
+		middle_reorder_num += reorder[len(reorder) // 2]
 
 print(f"sum of middle page nums: {middle_page_num} ")
+print(f"sum of midle reorderd page nums: {middle_reorder_num} ")
