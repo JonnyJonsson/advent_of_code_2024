@@ -27,7 +27,7 @@ class Guard:
 			case 360:
 				self.pos[0] -= 1
 
-		print(f"new player pos: {self.pos}")
+		# print(f"new player pos: {self.pos}")
 
 	def get_next_tile(self):
 		match self.rot:
@@ -122,7 +122,7 @@ def run(map, guard):
 		print("out of bounds")
 		return False
 	elif map.is_tile_obstacle(next_tile):
-		print(f"obstacle at {next_tile}")
+		# print(f"obstacle at {next_tile}")
 		guard.rotate()
 		return True
 	else:
@@ -139,22 +139,42 @@ while calculate:
 map.render_map()
 print(f"distinct positions = {map.get_distinct_pos_len()}")
 
-map_orginal = copy.deepcopy(map)
+
+# Part 2
+def paradox(input, obstacle_pos):
+	map = Map(input)
+	if map.get_start_player():
+		guard = Guard(map.get_start_player())
+	else:
+		return 0
+	# print(f"obstacle pos: {obstacle_pos}")
+	map.replace_entity(obstacle_pos, "#")
+
+	calculate = True
+	counter = 0
+	while calculate and counter < 10000:
+		counter += 1
+		calculate = run(map, guard)
+	if counter > 9000:
+		print("infinite found")
+		return 1
+	else:
+		return 0
+	# print("replaced 1 entitiy")
+
+
 distinct_pos = map.get_distinct_pos()
+infinite = 0
 
-while True:
-	try:
-		# print(type(map.get_distinct_pos()))
+for x in range(len(distinct_pos)):
+	input = []
+	with open("day6_input", "r") as f:
+		reader = csv.reader(f, delimiter=" ")
+		for row in reader:
+			input.append(row)
 
-		guard = Guard(start_pos)
-		map = map_orginal
-		map.replace_entity(distinct_pos.pop(), "#")
-		calculate = True
-		while calculate:
-			calculate = run(map, guard)
-		# print("replaced 1 entitiy")
-	except Exception as ex:
-		print(ex)
-		break
+	obstacle_pos = distinct_pos.pop()
+	infinite += paradox(input, obstacle_pos)
 
 map.render_map()
+print(f"infite: {infinite}")
