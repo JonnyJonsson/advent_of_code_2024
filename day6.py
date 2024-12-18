@@ -1,12 +1,4 @@
 import csv
-import copy
-
-input = []
-
-with open("day6_input", "r") as f:
-	reader = csv.reader(f, delimiter=" ")
-	for row in reader:
-		input.append(row)
 
 
 class Guard:
@@ -101,6 +93,10 @@ class Map:
 	def replace_entity(self, pos, entity):
 		input[pos[0]][0] = input[pos[0]][0][: pos[1]] + entity + input[pos[0]][0][pos[1] + 1 :]
 
+	def get_entity(self, pos):
+		entity = input[pos[0]][0][pos[1]]
+		return entity
+
 	def render_map(self):
 		for pos in self.dist:
 			self.replace_entity(pos, "X")
@@ -108,11 +104,6 @@ class Map:
 			for row in self.input:
 				f.write(row[0])
 				f.write("\n")
-
-
-map = Map(input)
-start_pos = map.get_start_player()
-guard = Guard(start_pos)
 
 
 def run(map, guard):
@@ -131,23 +122,30 @@ def run(map, guard):
 		return True
 
 
+# Part 1
+input = []
+with open("day6_input", "r") as f:
+	reader = csv.reader(f, delimiter=" ")
+	for row in reader:
+		input.append(row)
+
+map = Map(input)
+start_pos = map.get_start_player()
+guard = Guard(start_pos)
+
 calculate = True
 while calculate:
 	calculate = run(map, guard)
-
 
 map.render_map()
 print(f"distinct positions = {map.get_distinct_pos_len()}")
 
 
 # Part 2
-def paradox(input, obstacle_pos):
-	map = Map(input)
-	if map.get_start_player():
-		guard = Guard(map.get_start_player())
-	else:
-		return 0
-	# print(f"obstacle pos: {obstacle_pos}")
+def paradox(map, obstacle_pos):
+	guard = Guard(map.get_start_player())
+
+	old_entity = map.get_entity(obstacle_pos)
 	map.replace_entity(obstacle_pos, "#")
 
 	calculate = True
@@ -157,24 +155,26 @@ def paradox(input, obstacle_pos):
 		calculate = run(map, guard)
 	if counter > 9000:
 		print("infinite found")
+		map.replace_entity(obstacle_pos, old_entity)
 		return 1
 	else:
+		map.replace_entity(obstacle_pos, old_entity)
 		return 0
-	# print("replaced 1 entitiy")
 
+
+input = []
+with open("day6_input", "r") as f:
+	reader = csv.reader(f, delimiter=" ")
+	for row in reader:
+		input.append(row)
 
 distinct_pos = map.get_distinct_pos()
 infinite = 0
+map = Map(input)
 
-for x in range(len(distinct_pos)):
-	input = []
-	with open("day6_input", "r") as f:
-		reader = csv.reader(f, delimiter=" ")
-		for row in reader:
-			input.append(row)
-
+for _ in range(len(distinct_pos)):
 	obstacle_pos = distinct_pos.pop()
-	infinite += paradox(input, obstacle_pos)
+	infinite += paradox(map, obstacle_pos)
 
 map.render_map()
 print(f"infite: {infinite}")
